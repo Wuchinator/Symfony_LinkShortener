@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\LinkRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: LinkRepository::class)]
 class Link
@@ -14,6 +16,9 @@ class Link
     private ?int $id = null;
 
     #[ORM\Column(length: 1024)]
+    #[Assert\Url(
+        message: 'Некорректный URL. Пример: https://example.com'
+    )]
     private ?string $fullUrl = null;
 
     #[ORM\Column(length: 6)]

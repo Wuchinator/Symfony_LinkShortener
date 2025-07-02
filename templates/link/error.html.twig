@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ссылка не найдена или удалена{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+        <div class="text-center">
+            <h2 class="mb-4 text">Cсылка не найдена или удалена</h2>
+            <a class="btn btn-danger" href="{{ path('link_list') }}">Вернуться</a>
+        </div>
+    </div>
+{% endblock %}

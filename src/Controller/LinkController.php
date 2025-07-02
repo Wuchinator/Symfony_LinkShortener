@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\Link;
 use App\Form\LinkType;
 use App\Repository\LinkRepository;
+use App\Service\CodeGenerator;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,10 +16,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+date_default_timezone_set('Europe/Moscow');
 
 class LinkController extends AbstractController
 {
-    #[Route('/', name: 'link_list')]
+
+    #[Route('/', name: 'link_list', methods: ['GET'])]
+
     public function index(LinkRepository $repo): Response
     {
         return $this->render('link/index.html.twig', [
@@ -28,17 +33,18 @@ class LinkController extends AbstractController
     /**
      * @throws RandomException
      */
-    #[Route('/new', name: 'link_new')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    #[Route('/new', name: 'link_new',  methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $em, CodeGenerator $codeGenerator): Response
     {
         $link = new Link();
         $form = $this->createForm(LinkType::class, $link);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $code = $codeGenerator->generate();
             $link
-                ->setCreatedAt(new \DateTimeImmutable())
-                ->setShortUrl(bin2hex(random_bytes(3)))
+                ->setCreatedAt(new DateTimeImmutable())
+                ->setShortUrl($code)
                 ->setVisitCount(0);
             $em->persist($link);
             $em->flush();
@@ -51,21 +57,12 @@ class LinkController extends AbstractController
         ]);
     }
 
-    #[Route('/delete/{id}', name: 'link_delete')]
-    public function delete(Link $link, EntityManagerInterface $em): Response
-    {
-        $em->remove($link);
-        $em->flush();
-
-        return $this->redirectToRoute('link_list');
-    }
-
-    #[Route('/visit/{code}', name: 'link_visit')]
-    public function visit(string $code, LinkRepository $repo, EntityManagerInterface $em): RedirectResponse
+    #[Route('/visit/{code}', name: 'link_visit', methods: ['GET'])]
+    public function visit(string $code, LinkRepository $repo, EntityManagerInterface $em): Response
     {
         $link = $repo->findOneByShortCode($code);
         if (!$link) {
-            throw $this->createNotFoundException('Ссылка не найдена');
+            return $this->render('link/error.html.twig');
         }
 
         $link
@@ -76,7 +73,17 @@ class LinkController extends AbstractController
         return new RedirectResponse($link->getFullUrl(), Response::HTTP_FOUND);
     }
 
-    #[Route('/delete-multiple', name: 'link_delete_multiple', methods: ['POST'])]
+    #[Route('/delete/{id}', name: 'link_delete', methods: ['GET'])]
+    public function delete(Link $link, EntityManagerInterface $em): Response
+    {
+
+        $em->remove($link);
+        $em->flush();
+
+        return $this->redirectToRoute('link_list');
+    }
+
+    #[Route('/delete-multiple', name: 'link_delete_multiple', methods: ['POST', 'DELETE'])]
     public function deleteMultiple(Request $request, LinkRepository $repo, EntityManagerInterface $em): Response
     {
         $ids = $request->request->all('delete_ids');

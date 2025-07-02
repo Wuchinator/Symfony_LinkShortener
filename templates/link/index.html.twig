@@ -21,7 +21,7 @@
             {% for link in links %}
                 <tr>
                     <td><input class="form-check-input cb" type="checkbox" name="delete_ids[]" value="{{ link.id }}"></td>
-                    <td><a href="{{ link.fullUrl }}" target="_blank">{{ link.fullUrl|length > 40 ? link.fullUrl|slice(0, 40) ~ '...' : link.fullUrl }}</a></td>
+                    <td><a href="{{ link.fullUrl }}" target="_blank">{{ link.fullUrl|length > 30 ? link.fullUrl|slice(0, 30) ~ '...' : link.fullUrl }}</a></td>
                     <td><a href="{{ path('link_visit', { code: link.shortUrl}) }}" target="_blank">{{ link.shortUrl }}</a></td>
                     <td>{{ link.visitCount }}</td>
                     <td>{{ link.lastUsedAt ? link.lastUsedAt|date('Y-m-d H:i') : '—' }}</td>
