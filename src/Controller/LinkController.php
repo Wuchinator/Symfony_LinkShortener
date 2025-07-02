@@ -83,7 +83,7 @@ class LinkController extends AbstractController
         return $this->redirectToRoute('link_list');
     }
 
-    #[Route('/delete-multiple', name: 'link_delete_multiple', methods: ['POST', 'DELETE'])]
+    #[Route('/delete-multiple', name: 'link_delete_multiple', methods: ['POST'])]
     public function deleteMultiple(Request $request, LinkRepository $repo, EntityManagerInterface $em): Response
     {
         $ids = $request->request->all('delete_ids');
