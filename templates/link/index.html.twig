@@ -15,6 +15,8 @@
                 <th>Количество переходов</th>
                 <th>Последний переход</th>
                 <th>Действия</th>
+                <th>Одноразовая</th>
+                <th>Истекает</th>
             </tr>
             </thead>
             <tbody>
@@ -28,6 +30,8 @@
                     <td>
                         <a class="btn btn-sm btn-outline-danger" href="{{ path('link_delete', { id: link.id }) }}">Удалить</a>
                     </td>
+                    <td>{{ link.isOneTime ? 'Да' : 'Нет' }}</td>
+                    <td>{{ link.expiresAt ? link.expiresAt|date('Y-m-d H:i') : '—' }}</td>
                 </tr>
             {% else %}
                 <tr><td colspan="7" class="text-center">Нет ссылок</td></tr>

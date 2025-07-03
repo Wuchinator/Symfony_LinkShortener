@@ -5,10 +5,11 @@ namespace App\Entity;
 use App\Repository\LinkRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Constraints\Unique;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 
 #[ORM\Entity(repositoryClass: LinkRepository::class)]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt')]
 class Link
 {
     #[ORM\Id]
@@ -35,6 +36,36 @@ class Link
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTime $lastUsedAt = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $isOneTime = false;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Assert\GreaterThan('today', message: 'Дата должна быть в будущем')]
+    private ?\DateTime $expiresAt = null;
+
+    #[ORM\Column(name: "deletedAt", type: 'datetime', nullable: true)]
+    private ?\DateTime $deletedAt = null;
+
+    public function getDeletedAt(): ?\DateTime {
+        return $this->deletedAt;
+    }
+    public function setDeletedAt(?\DateTime $deletedAt): static {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+    public function isOneTime(): bool { return $this->isOneTime; }
+    public function setIsOneTime(bool $isOneTime): static {
+        $this->isOneTime = $isOneTime;
+        return $this;
+    }
+
+    public function getExpiresAt(): ?\DateTime {
+        return $this->expiresAt;
+    }
+    public function setExpiresAt(?\DateTime $expiresAt): static {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
     public function getId(): ?int
     {
         return $this->id;

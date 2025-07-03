@@ -64,11 +64,19 @@ class LinkController extends AbstractController
         if (!$link) {
             return $this->render('link/error.html.twig');
         }
+        if ($link->getExpiresAt() && new \DateTime() > $link->getExpiresAt()) {
+            return $this->render('link/expired.html.twig');
+        }
+
+        if ($link->isOneTime() && $link->getVisitCount() > 0) {
+            return $this->render('link/expired.html.twig');
+        }
 
         $link
             ->setVisitCount($link->getVisitCount() + 1)
             ->setLastUsedAt(new DateTime());
         $em->flush();
+
 
         return new RedirectResponse($link->getFullUrl(), Response::HTTP_FOUND);
     }
