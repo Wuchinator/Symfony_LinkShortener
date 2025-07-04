@@ -40,7 +40,7 @@ class Link
     private bool $isOneTime = false;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    #[Assert\GreaterThan('today', message: 'Дата должна быть в будущем')]
+    #[Assert\GreaterThan('today', message: 'Дата должна в будущем')]
     private ?\DateTime $expiresAt = null;
 
     #[ORM\Column(name: "deletedAt", type: 'datetime', nullable: true)]
